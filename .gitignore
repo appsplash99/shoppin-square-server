@@ -105,3 +105,6 @@ dist
 
 # ignore views folder
 views/
+
+# ignore .http file
+*.http
