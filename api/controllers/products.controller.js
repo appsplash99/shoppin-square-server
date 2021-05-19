@@ -49,9 +49,9 @@ exports.addNewProduct = async (req, res) => {
       category: req.body.category,
       offer: req.body.offer,
     });
-    const newProduct = await newProduct.save()
+    const savedProduct = await newProduct.save()
     res.status(201).json({
-      product: newProduct,
+      product: savedProduct,
       message: "Product saved successfully in the database"
     })
   } catch (error) {
