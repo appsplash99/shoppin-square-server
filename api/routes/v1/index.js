@@ -1,5 +1,7 @@
 const express = require('express');
 const productRoutes = require('./products.route');
+const wishlistRoutes = require('./wishlist.route');
+const cartRoutes = require('./cart.route');
 
 const router = express.Router();
 
@@ -13,7 +15,8 @@ router.get('/status', (req, res) => res.send('OK'));
  */
 router.use('/docs', express.static('docs'));
 
-///////////////////////// all routes will come here
 router.use('/products', productRoutes);
+router.use('/wishlist', wishlistRoutes);
+router.use('/cart', cartRoutes);
 
 module.exports = router;

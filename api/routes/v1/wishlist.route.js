@@ -14,7 +14,7 @@ router
   .get("/:wishlistItemId", findWishlistItemById)
   // /api/v1/wishlist/
   .post("/", addNewWishlistItem)
-  // 
+  // /api/v1/wishlist/
   .delete('/:wishlistItemId', deleteWishlistItem)
 
 module.exports = router

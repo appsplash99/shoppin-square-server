@@ -10,7 +10,7 @@ exports.getWishlistItems = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to get wishlistItems, please check 'errorMessage' key for more details",
+      message: "Failed to get wishlistItems",
       errorMessage: error.message
     })
   }

@@ -1,11 +1,5 @@
 const path = require('path');
 
-// // import .env variables
-// require('dotenv').load({
-//   path: path.join(__dirname, '../../.env'),
-//   sample: path.join(__dirname, '../../.env.example'),
-// });
-
 require('dotenv').config()
 
 module.exports = {
