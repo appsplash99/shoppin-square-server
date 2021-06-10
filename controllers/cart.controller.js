@@ -1,37 +1,35 @@
-const Cart = require("../models/cart.model");
+const Cart = require('../models/cart.model');
 
 exports.getCartItems = async (req, res) => {
   try {
     const cartItems = await Cart.find({});
     res.status(200).json({
       success: true,
-      cartItems
-    })
+      cartItems,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to get Cart Items",
-      errorMessage: error.message
-    })
+      message: 'Failed to get Cart Items',
+      errorMessage: error.message,
+    });
   }
-}
+};
 
 exports.findCartItemById = async (req, res) => {
   try {
     const cartItem = await Cart.findById(req.params.cartItemId);
     res.status(200).json({
       success: true,
-      cartItem
+      cartItem,
     });
   } catch (err) {
-    res
-      .status(400)
-      .json({
-        success: false,
-        message: "Unable to retrive the cart Item"
-      });
+    res.status(400).json({
+      success: false,
+      message: 'Unable to retrive the cart Item',
+    });
   }
-}
+};
 
 exports.addNewCartItem = async (req, res) => {
   try {
@@ -52,61 +50,64 @@ exports.addNewCartItem = async (req, res) => {
       category: req.body.category,
       offer: req.body.offer,
     });
-    const savedCartItem = await newCartItem.save()
+    const savedCartItem = await newCartItem.save();
     res.status(201).json({
       success: true,
-      message: "cartItem saved successfully in the database",
+      message: 'cartItem saved successfully in the database',
       savedCartItem,
-    })
+    });
   } catch (error) {
     res.status(500).json({
       success: 'false',
       errorMessage: error.message,
-      message: "Failed to save new cartItem in the database",
-    })
+      message: 'Failed to save new cartItem in the database',
+    });
   }
-}
+};
 
 exports.deleteCartItemById = async (req, res) => {
   try {
     const removeCartItem = await Cart.remove({
-      _id: req.params.cartItemId
-    })
+      _id: req.params.cartItemId,
+    });
     const newCartItems = await Cart.find();
     res.json({
       success: true,
       deletedCartItem: removeCartItem,
-      newCartItems
-    })
+      newCartItems,
+    });
   } catch (error) {
     res.json({
       success: false,
-      message: "Failed to delete cart Item",
-      errorMessege: error.message
-    })
+      message: 'Failed to delete cart Item',
+      errorMessege: error.message,
+    });
   }
-}
+};
 
 exports.updateCartItemQtyById = async (req, res) => {
   try {
-    const updatedCartItem = await Cart.updateOne({
-      _id: req.params.cartItemId
-    }, {
-      $set: {
-        qty: req.body.qty
+    const updatedCartItem = await Cart.updateOne(
+      {
+        _id: req.params.cartItemId,
       },
-    });
+      {
+        $set: {
+          qty: req.body.qty,
+        },
+      }
+    );
     const newCartItems = await Cart.find();
     res.json({
       success: true,
       updatedCartItem,
-      newCartItems
+      newCartItems,
     });
     // console.log(updatedPrd);
   } catch (err) {
     res.json({
-      message: err.message
+      message: err.message,
     });
     console.log(err);
   }
-}
+};

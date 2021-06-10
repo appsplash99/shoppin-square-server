@@ -1,23 +1,22 @@
-const express = require('express')
+const router = require('express').Router();
 const {
   getCartItems,
   addNewCartItem,
   findCartItemById,
   deleteCartItemById,
-  updateCartItemQtyById
+  updateCartItemQtyById,
 } = require('../../controllers/cart.controller');
-const router = express.Router();
 
 router
   // /api/v1/cart/
-  .get("/", getCartItems)
+  .get('/', getCartItems)
   // /api/v1/cart/cartItemId
-  .get("/:cartItemId", findCartItemById)
+  .get('/:cartItemId', findCartItemById)
   // /api/v1/cart/
-  .post("/", addNewCartItem)
+  .post('/', addNewCartItem)
   // /api/v1/cart/cartItemId
   .delete('/:cartItemId', deleteCartItemById)
   // /api/vi/cart/cartItemId
-  .patch('/:CartItemId', updateCartItemQtyById)
+  .patch('/:CartItemId', updateCartItemQtyById);
 
-module.exports = router
+module.exports = router;

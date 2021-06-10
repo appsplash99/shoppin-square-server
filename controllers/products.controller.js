@@ -5,30 +5,29 @@ exports.getProducts = async (req, res) => {
     const products = await Product.find({});
     res.status(200).json({
       products: products,
-      success: true
-    })
+      success: true,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to get Products, please check 'errorMessage' key for more details",
-      errorMessage: error.message
-    })
+      message:
+        "Failed to get Products, please check 'errorMessage' key for more details",
+      errorMessage: error.message,
+    });
   }
-}
+};
 
 exports.findProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.productId);
     res.status(200).json(product);
   } catch (err) {
-    res
-      .status(400)
-      .json({
-        success: false,
-        message: "Unable to retrive the product"
-      });
+    res.status(400).json({
+      success: false,
+      message: 'Unable to retrive the product',
+    });
   }
-}
+};
 
 exports.addNewProduct = async (req, res) => {
   try {
@@ -49,16 +48,16 @@ exports.addNewProduct = async (req, res) => {
       category: req.body.category,
       offer: req.body.offer,
     });
-    const savedProduct = await newProduct.save()
+    const savedProduct = await newProduct.save();
     res.status(201).json({
       product: savedProduct,
-      message: "Product saved successfully in the database"
-    })
+      message: 'Product saved successfully in the database',
+    });
   } catch (error) {
     res.status(500).json({
       success: 'false',
-      message: "Failed to save new Product in the database",
-      errorMessage: error.message
-    })
+      message: 'Failed to save new Product in the database',
+      errorMessage: error.message,
+    });
   }
-}
+};
