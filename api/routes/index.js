@@ -1,22 +1,22 @@
-const express = require('express');
+const router = require('express').Router();
+
+// Routes
 const productRoutes = require('./products.router');
 const wishlistRoutes = require('./wishlist.router');
 const cartRoutes = require('./cart.router');
+const userRoutes = require('./user.router');
 
-const router = express.Router();
+// Middlewares
+const verifyToken = require('../../middlewares/verifyToken.middleware')
 
 /**
- * GET v1/status
+ * GET api/status
  */
 router.get('/status', (req, res) => res.send('OK'));
 
-/**
- * GET v1/docs
- */
-router.use('/docs', express.static('docs'));
-
 router.use('/products', productRoutes);
-router.use('/wishlist', wishlistRoutes);
-router.use('/cart', cartRoutes);
+router.use('/wishlist', verifyToken, wishlistRoutes);
+router.use('/cart', verifyToken, cartRoutes);
+router.use('/user', userRoutes);
 
 module.exports = router;
