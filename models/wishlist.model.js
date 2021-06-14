@@ -1,62 +1,15 @@
-const mongoose = require("mongoose");
 const {
+  model,
   Schema
-} = mongoose;
+} = require('mongoose')
 
 const wishlistSchema = new Schema({
-  description: {
-    type: String,
-    trim: true,
-    required: "description is required"
+  _id: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
   },
-  image: {
-    type: String,
-    trim: true,
-    required: "image is required"
-  },
-  brandName: {
-    type: String,
-    trim: true,
-    required: "brandName is required"
-  },
-  price: {
-    type: String,
-    trim: true,
-    required: "price is required"
-  },
-  discount: {
-    type: Number
-  },
-  isNewProduct: {
-    type: Boolean,
-  },
-  sale: {
-    type: Boolean
-  },
-  inStock: {
-    type: Boolean
-  },
-  fastDelivery: {
-    type: Boolean
-  },
-  ratings: {
-    type: Number
-  },
-  numberOfRatings: {
-    type: Number
-  },
-  qty: {
-    type: Number
-  },
-  category: {
-    type: String
-  },
-  offer: {
-    type: String
-  }
-
 }, {
-  timestamps: true
+  timestamps: true,
 })
 
-module.exports = mongoose.model("Wishlist", wishlistSchema);
+module.exports = model("Wishlist", wishlistSchema)

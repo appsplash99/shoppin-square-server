@@ -7,13 +7,10 @@ const {
 } = require('../../controllers/wishlist.controller');
 
 router
-  // /api/v1/wishlist/
+  /** url route - BASE_URL/api/wishlist */
   .get('/', getWishlistItems)
-  // /api/v1/wishlist/wishlistItemId
   .get('/:wishlistItemId', findWishlistItemById)
-  // /api/v1/wishlist/
   .post('/', addNewWishlistItem)
-  // /api/v1/wishlist/
   .delete('/:wishlistItemId', deleteWishlistItem);
 
 module.exports = router;

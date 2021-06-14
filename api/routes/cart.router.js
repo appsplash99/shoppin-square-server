@@ -7,16 +7,14 @@ const {
   updateCartItemQtyById,
 } = require('../../controllers/cart.controller');
 
+
 router
-  // /api/v1/cart/
+  /** url route - BASE_URL/api/cart */
   .get('/', getCartItems)
-  // /api/v1/cart/cartItemId
-  .get('/:cartItemId', findCartItemById)
-  // /api/v1/cart/
   .post('/', addNewCartItem)
-  // /api/v1/cart/cartItemId
+  .get('/:cartItemId', findCartItemById)
+
   .delete('/:cartItemId', deleteCartItemById)
-  // /api/vi/cart/cartItemId
   .patch('/:CartItemId', updateCartItemQtyById);
 
 module.exports = router;
