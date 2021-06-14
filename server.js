@@ -1,21 +1,22 @@
 const app = require('./config/expressApp');
-const { port } = require('./config/constants');
+const consola = require('consola')
+const {
+  port
+} = require('./config/constants');
 const database = require('./config/database');
-const path = require('path'); // for dev purposes only
 
 /**Connect to Mongoose */
 database.connect();
 
-console.log(__dirname);
+// console.log(__dirname);
 
+//////////////////////////////// for dev purposes only
+const path = require('path');
 app.use('/', (req, res) => {
   return res.sendFile(path.join(__dirname, '/views/home.html'));
 });
+//////////////////////////////// for dev purposes only
 
 app.listen(port || 3001, () => {
-  console.log(`
-################################
- Server listening on port: ${port}
-################################
-  `);
+  consola.success(`Express Server running on port: ${port}`);
 });
