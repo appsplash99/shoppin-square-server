@@ -1,17 +1,22 @@
 const mongoose = require('mongoose');
-const { uriEcommerce, uriInventory } = require('./constants');
+const {
+  uriEcommerce,
+  uriInventory,
+  uriNewEcommerce
+} = require('./constants');
 
-const URI = uriEcommerce;
+const URI = uriNewEcommerce;
 
 const connectToDb = async () => {
   try {
     await mongoose.connect(URI, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
+      useCreateIndex: true,
     });
-    console.log('MongoDB connected sucessfully');
+    consola.success('MongoDB connected sucessfully');
   } catch (error) {
-    console.log('MongoDB connection has failed..', error);
+    consola.error('MongoDB connection has failed..', error);
   }
 };
 exports.connect = () => {
