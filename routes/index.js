@@ -16,7 +16,7 @@ router.get('/status', (req, res) => res.send('OK'))
 
 router.use('/products', productRoutes)
 
-// Protected ROutes - need verifyToken Middleware
+// TODO: Protected ROutes - need verifyToken Middleware
 router.use('/wishlist', wishlistRoutes)
 router.use('/cart', cartRoutes)
 router.use('/user', userRoutes)
