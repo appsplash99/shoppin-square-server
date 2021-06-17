@@ -1,58 +1,23 @@
 const bcrypt = require('bcrypt')
 const User = require('../models/user.model')
-const {
-  generateToken
-} = require('../utils/generateToken')
-const {
-  generateHashedPassword
-} = require('../utils/generateHashedPassword')
-const {
-  registerValidation,
-  loginValidation
-} = require('../utils/validation')
+const { initializeNewUser } = require('../utils/initializeNewUser')
+const { generateToken } = require('../utils/generateToken')
+const { generateHashedPassword } = require('../utils/generateHashedPassword')
+const { registerValidation, loginValidation } = require('../utils/validation')
 
-/** 
- * controller for router.param middleware 
- * */
-exports.findUserById = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.params.userId)
-    if (!user) res.status(400).send('User Not found!')
-    req.user = user
-    consola.success('User found by userId')
-    next()
-  } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: 'Unable to retrive the User by userId',
-      error: err,
-    })
-  }
-}
-
-/** 
- * remaining route controllers 
- * */
+/**controllers for individual routes */
 exports.registerNewUser = async (req, res) => {
   // TODO: below lines might be abstracted by errorHandler
   // validate user before saving to database
-  const {
-    error
-  } = registerValidation(req.body)
+  const { error } = registerValidation(req.body)
   if (error) return res.status(400).send(error.details[0].message)
 
   // check if email exists
-  const emailAlreadyExists = await User.findOne({
-    email: req.body.email,
-  })
+  const emailAlreadyExists = await User.findOne({ email: req.body.email })
   if (emailAlreadyExists) return res.status(400).send('Email already Exists')
 
   // proceed to save user
-  const {
-    name,
-    email,
-    password
-  } = req.body
+  const { name, email, password } = req.body
 
   // Hash password
   const hashedPassword = await generateHashedPassword(password)
@@ -65,17 +30,18 @@ exports.registerNewUser = async (req, res) => {
   })
 
   try {
-    // save user
-    const savedUser = await user.save()
+    const registeredUser = await initializeNewUser(user)
     res.status(201).json({
       success: true,
-      user: savedUser._id,
+      message: 'User Registered Successfully',
+      ...registeredUser,
     })
   } catch (err) {
-    consola.error(new Error('Error while saving user', err))
+    consola.error(new Error('User Registeration Failed', err))
     res.status(400).json({
       success: false,
-      error: err.message,
+      message: 'User Registeration Failed',
+      error: err,
     })
   }
 }
@@ -83,15 +49,11 @@ exports.registerNewUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   // TODO: below lines might be abstracted by errorHandler
   // validate user before logging in
-  const {
-    error
-  } = loginValidation(req.body)
+  const { error } = loginValidation(req.body)
   if (error) return res.status(400).send(error.details[0].message)
 
   // does email exists
-  const user = await User.findOne({
-    email: req.body.email,
-  })
+  const user = await User.findOne({ email: req.body.email })
   if (!user) return res.status(400).send('Email does not exist')
 
   // is typed password correct?
@@ -103,57 +65,46 @@ exports.loginUser = async (req, res) => {
   // pass token into response headers
   res.header('auth-token', token).json({
     success: true,
-    token
+    token,
   })
 }
 
 exports.updateUser = async (req, res) => {
-  const newUserInfo = req.body
+  const newInfoOfUser = req.body
   /**
    * check for edge cases
    */
-  if (newUserInfo.password) {
+  if (newInfoOfUser.password) {
     consola.info('hashedPass')
-    newUserInfo.password = await generateHashedPassword(newUserInfo.password)
+    newInfoOfUser.password = await generateHashedPassword(
+      newInfoOfUser.password
+    )
   }
 
   try {
-    const updatedUser = await User.update({
-      _id: req.user._id
-    }, {
-      $set: newUserInfo
-    })
+    const updatedUser = await User.update(
+      { _id: req.user._id },
+      { $set: newInfoOfUser }
+    )
     // consola.info(updatedUser)
-    res.status(201).json({
-      success: true,
-      user: updatedUser._id
-    })
+    res.status(201).json({ success: true, user: updatedUser._id })
   } catch (err) {
     consola.error(new Error('Error while Updating user', err))
     res.status(400).json({
       success: false,
       message: 'Error while Updating user',
-      error: err
+      error: err,
     })
   }
 }
 
 exports.deleteUser = async (req, res) => {
   try {
-    let {
-      user
-    } = req
+    let { user } = req
     await user.remove()
-    res.status(200).json({
-      success: true,
-      deletedUser: user._id
-    })
+    res.status(200).json({ success: true, deletedUser: user._id })
   } catch (err) {
     consola.error(new Error('Cannot remove selected user'))
-    res.status(200).json({
-      success: false,
-      user: user._id,
-      error: err
-    })
+    res.status(200).json({ success: false, user: user._id, error: err })
   }
 }
