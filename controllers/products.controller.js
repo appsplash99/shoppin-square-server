@@ -1,33 +1,34 @@
-const Product = require('../models/product.model');
+const Product = require('../models/product.model')
 
 exports.getProducts = async (req, res) => {
   try {
-    const products = await Product.find({});
+    const products = await Product.find({})
     res.status(200).json({
-      products: products,
       success: true,
-    });
+      products: products,
+    })
   } catch (error) {
+    consola.error(new Error('Unable to get products', error))
     res.status(500).json({
       success: false,
-      message:
-        "Failed to get Products, please check 'errorMessage' key for more details",
+      message: 'Failed to get Products',
       errorMessage: error.message,
-    });
+    })
   }
-};
+}
 
-exports.findProductById = async (req, res) => {
+exports.getProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId);
-    res.status(200).json(product);
-  } catch (err) {
-    res.status(400).json({
+    res.status(200).json({ success: true, product: req.product })
+  } catch (error) {
+    consola.error(new Error('Product not found', error))
+    res.status(500).json({
       success: false,
-      message: 'Unable to retrive the product',
-    });
+      message: 'Unable to get the Product',
+      error: error,
+    })
   }
-};
+}
 
 exports.addNewProduct = async (req, res) => {
   try {
@@ -47,17 +48,19 @@ exports.addNewProduct = async (req, res) => {
       qty: req.body.qty,
       category: req.body.category,
       offer: req.body.offer,
-    });
-    const savedProduct = await newProduct.save();
+    })
+    const savedProduct = await newProduct.save()
+    consola.success('Products Successfully Added to DB Created')
     res.status(201).json({
       product: savedProduct,
       message: 'Product saved successfully in the database',
-    });
+    })
   } catch (error) {
+    consola.error(new Error('Produts Not updated in database', error))
     res.status(500).json({
       success: 'false',
       message: 'Failed to save new Product in the database',
       errorMessage: error.message,
-    });
+    })
   }
-};
+}
