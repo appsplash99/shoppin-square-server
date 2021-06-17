@@ -1,11 +1,11 @@
 const router = require('express').Router()
 const {
-  loginUser,
   registerNewUser,
-  findUserById,
+  loginUser,
   deleteUser,
   updateUser,
-} = require('../../controllers/user.controller')
+} = require('../controllers/user.controller')
+const { findUserById } = require('../controllers/routerParam.controller')
 
 /** router.param middleware which runs on all routes below it */
 router.param('userId', findUserById)
@@ -18,20 +18,17 @@ router
   .post('/login', loginUser)
 
   // READ
-  .get('/:userId', (req, res) =>
-    res.status(200).json({
-      success: true,
-      user: req.user._id,
-    })
-  )
+  .get('/:userId', (req, res) => {
+    res.status(200).json({ success: true, user: req.user._id })
+  })
 
   // UPDATE
-  .post('/:userId', updateUser)
+  .patch('/:userId', updateUser)
 
   // DELETE
   .delete('/:userId', deleteUser)
 
-// migh not need the '/ap/user/users' route
+// might not need the '/ap/user/users' route
 // .get("/users", (req, res) => res.send("all users"))
 
 module.exports = router

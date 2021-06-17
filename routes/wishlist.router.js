@@ -4,7 +4,7 @@ const {
   findWishlistItemById,
   addNewWishlistItem,
   deleteWishlistItem,
-} = require('../../controllers/wishlist.controller');
+} = require('../controllers/wishlist.controller');
 
 router
   /** url route - BASE_URL/api/wishlist */
