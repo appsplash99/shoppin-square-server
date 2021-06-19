@@ -71,21 +71,14 @@ exports.loginUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   const newInfoOfUser = req.body
-  /**
-   * check for edge cases
-   */
   if (newInfoOfUser.password) {
     consola.info('hashedPass')
     newInfoOfUser.password = await generateHashedPassword(
       newInfoOfUser.password
     )
   }
-
   try {
-    const updatedUser = await User.updateOne(
-      { _id: req.user._id },
-      { $set: newInfoOfUser }
-    )
+    await User.updateOne({ _id: req.user._id }, { $set: newInfoOfUser })
     res.status(201).json({
       success: true,
       message: 'Scuuessfully updated User Details',
