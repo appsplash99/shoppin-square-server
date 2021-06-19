@@ -82,12 +82,15 @@ exports.updateUser = async (req, res) => {
   }
 
   try {
-    const updatedUser = await User.update(
+    const updatedUser = await User.updateOne(
       { _id: req.user._id },
       { $set: newInfoOfUser }
     )
-    // consola.info(updatedUser)
-    res.status(201).json({ success: true, user: updatedUser._id })
+    res.status(201).json({
+      success: true,
+      message: 'Scuuessfully updated User Details',
+      updatedUser: req.user._id,
+    })
   } catch (err) {
     consola.error(new Error('Error while Updating user', err))
     res.status(400).json({
