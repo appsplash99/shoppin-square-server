@@ -1,15 +1,15 @@
-const {
-  model,
-  Schema
-} = require('mongoose')
+const { Schema, model } = require('mongoose')
 
-const wishlistSchema = new Schema({
-  _id: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-  },
-}, {
-  timestamps: true,
+const wishlistItemsSchema = new Schema({
+  product: { type: Schema.Types.ObjectId, ref: 'Product' },
 })
 
-module.exports = model("Wishlist", wishlistSchema)
+const wishlistSchema = new Schema(
+  {
+    _id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    wishlistItems: [wishlistItemsSchema],
+  },
+  { timestamps: true }
+)
+
+module.exports = model('Wishlist', wishlistSchema)
