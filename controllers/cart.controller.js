@@ -1,13 +1,12 @@
 const Cart = require('../models/cart.model')
 
 exports.getCartItems = async (req, res) => {
+  let { cart } = req
   try {
-    const cartItems = await Cart.find({})
-    res.status(200).json({
-      success: true,
-      cartItems,
-    })
+    cart = await cart.populate('cartItems.product').execPopulate()
+    res.status(200).json({ success: true, cart })
   } catch (error) {
+    consola.error(new Error('Unable to get Cart Item by productId', error))
     res.status(500).json({
       success: false,
       message: 'Failed to get Cart Items',
@@ -16,98 +15,116 @@ exports.getCartItems = async (req, res) => {
   }
 }
 
-exports.findCartItemById = async (req, res) => {
+exports.getOneCartItem = async (req, res) => {
+  let { cart, product } = req
   try {
-    const cartItem = await Cart.findById(req.params.cartItemId)
+    let populatedCart = await cart.populate('cartItems.product').execPopulate()
+    let desiredCartItem = populatedCart.cartItems.id(product._id)
     res.status(200).json({
       success: true,
-      cartItem,
+      message: 'CartItem found!',
+      cartItem: desiredCartItem,
     })
-  } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: 'Unable to retrive the cart Item',
-    })
+  } catch (error) {
+    consola.error(new Error('Unable to get desired Cart Item', error))
+    res
+      .status(400)
+      .json({ success: false, message: 'Cart Item not found', error: error })
   }
 }
 
 exports.addNewCartItem = async (req, res) => {
+  let { product, cart, user } = req
   try {
-    const newCartItem = new Cart({
-      description: req.body.description,
-      image: req.body.image,
-      brandName: req.body.brandName,
-      price: req.body.price,
-      discount: req.body.discount,
-      rating: req.body.rating,
-      isNewProduct: req.body.isNewProduct,
-      sale: req.body.sale,
-      inStock: req.body.inStock,
-      fastDelivery: req.body.fastDelivery,
-      ratings: req.body.ratings,
-      numberOfRatings: req.body.numberOfRatings,
-      qty: req.body.qty,
-      category: req.body.category,
-      offer: req.body.offer,
-    })
-    const savedCartItem = await newCartItem.save()
+    /** finding a sub-document */
+    let productAlreadyInCart = cart.cartItems.id(product._id)
+    if (productAlreadyInCart) {
+      return res.send('Product Already exists in CartItems')
+    }
+
+    const newProductData = {
+      _id: product._id,
+      product: product._id,
+      quantity: 1,
+    }
+
+    // update does not return anything
+    await cart.updateOne({ $push: { cartItems: newProductData } })
+    updatedCart = await cart.populate('cartItems.product').execPopulate()
+
     res.status(201).json({
       success: true,
       message: 'cartItem saved successfully in the database',
-      savedCartItem,
+      updatedCart,
     })
   } catch (error) {
+    consola.error(new Error('Failed to Add new cart Item', error))
     res.status(500).json({
       success: 'false',
-      errorMessage: error.message,
       message: 'Failed to save new cartItem in the database',
-    })
-  }
-}
-
-exports.deleteCartItemById = async (req, res) => {
-  try {
-    const removeCartItem = await Cart.remove({
-      _id: req.params.cartItemId,
-    })
-    const newCartItems = await Cart.find()
-    res.json({
-      success: true,
-      deletedCartItem: removeCartItem,
-      newCartItems,
-    })
-  } catch (error) {
-    res.json({
-      success: false,
-      message: 'Failed to delete cart Item',
-      errorMessege: error.message,
+      errorMessage: error.message,
     })
   }
 }
 
 exports.updateCartItemQtyById = async (req, res) => {
+  let { cart, product } = req
   try {
-    const updatedCartItem = await Cart.updateOne(
-      {
-        _id: req.params.cartItemId,
-      },
-      {
-        $set: {
-          qty: req.body.qty,
-        },
-      }
+    const updatedCartItem = await Cart.findOneAndUpdate(
+      { _id: cart._id, 'cartItems._id': product._id },
+      { $set: { 'cartItems.$.quantity': req.body.quantity } },
+      { useFindAndModify: false }
     )
-    const newCartItems = await Cart.find()
+    let newPopulatedCart = await cart
+      .populate('cartItems.product')
+      .execPopulate()
+
+    /** Find the sub-document with _id equal to product._id*/
+    const newlyUpdatedCartItem = updatedCartItem.cartItems.id(product._id)
     res.json({
       success: true,
-      updatedCartItem,
-      newCartItems,
+      message: "Cart Item's Quantity Updated Successfully!",
+      updatedCartItem: newlyUpdatedCartItem,
+      latestCartItems: newPopulatedCart,
     })
-    // console.log(updatedPrd);
   } catch (err) {
-    res.json({
-      message: err.message,
+    consola.error(
+      new Error(new Error('Unable to update Quantity of desired CartItem', err))
+    )
+    res.status(400).json({
+      success: false,
+      message: 'Unable to update Quantity of desired CartItem',
+      message: err,
     })
-    console.log(err)
+  }
+}
+
+exports.deleteCartItemById = async (req, res) => {
+  let { cart, product } = req
+  try {
+    /** Select a sub-document to be removed */
+    const cartItemToBeRemoved = cart.cartItems.id(product._id)
+
+    /** Remove the subdoc */
+    cartItemToBeRemoved.remove()
+    /** Save new cart to database */
+    cart.save()
+
+    const newlyPopulatedCart = await cart
+      .populate('cartItems.product')
+      .execPopulate()
+    res.json({
+      success: true,
+      message: 'Cart Item successfully removed',
+      removedCartItem: cartItemToBeRemoved,
+      latestCart: newlyPopulatedCart,
+    })
+  } catch (error) {
+    consola.error(new Error('Failed to remove cart Item', error))
+    res.json({
+      success: false,
+      message: 'Failed to remove cart Item',
+      errorMessege: error.message,
+    })
   }
 }
