@@ -8,7 +8,7 @@ const {
 const {
   findWishlistByUserId,
   findProductById,
-} = require('../controllers/routerParam.controller')
+} = require('../middlewares/routerParam.middleware')
 
 /** Router middleware */
 router.param('userId', findWishlistByUserId)
