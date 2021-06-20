@@ -10,16 +10,16 @@ const {
   findUserById,
   findProductById,
   findCartByUserId,
-} = require('../controllers/routerParam.controller')
+} = require('../middlewares/routerParam.middleware')
 
 router.param('userId', findUserById)
 router.param('productId', findProductById)
 router.param('userId', findCartByUserId)
 
 router
-  .post('/:userId/:productId', addNewCartItem)
   .get('/:userId', getCartItems)
   .get('/:userId/:productId', getOneCartItem)
+  .post('/:userId/:productId', addNewCartItem)
   .patch('/:userId/:productId', updateCartItemQtyById)
   .delete('/:userId/:productId', deleteCartItem)
 

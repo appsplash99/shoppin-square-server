@@ -1,17 +1,16 @@
 const router = require('express').Router()
 const {
   getProducts,
-  getProduct,
+  getOneProduct,
   addNewProduct,
 } = require('../controllers/products.controller')
-const { findProductById } = require('../controllers/routerParam.controller')
+const { findProductById } = require('../middlewares/routerParam.middleware')
 
 router.param('productId', findProductById)
 
 router
-  /** url route - BASE_URL/api/products */
   .get('/', getProducts)
-  .get('/:productId', getProduct)
+  .get('/:productId', getOneProduct)
   .post('/', addNewProduct)
 
 module.exports = router
