@@ -1,16 +1,23 @@
-const router = require('express').Router();
+const router = require('express').Router()
 const {
   getWishlistItems,
-  findWishlistItemById,
+  getOneWishlistItem,
   addNewWishlistItem,
   deleteWishlistItem,
-} = require('../controllers/wishlist.controller');
+} = require('../controllers/wishlist.controller')
+const {
+  findWishlistByUserId,
+  findProductById,
+} = require('../controllers/routerParam.controller')
+
+/** Router middleware */
+router.param('userId', findWishlistByUserId)
+router.param('productId', findProductById)
 
 router
-  /** url route - BASE_URL/api/wishlist */
-  .get('/', getWishlistItems)
-  .get('/:wishlistItemId', findWishlistItemById)
-  .post('/', addNewWishlistItem)
-  .delete('/:wishlistItemId', deleteWishlistItem);
+  .get('/:userId', getWishlistItems)
+  .get('/:userId/:productId', getOneWishlistItem)
+  .post('/:userId/:productId', addNewWishlistItem)
+  .delete('/:userId/:productId', deleteWishlistItem)
 
-module.exports = router;
+module.exports = router

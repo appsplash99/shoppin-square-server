@@ -3,7 +3,7 @@ const {
   getCartItems,
   getOneCartItem,
   addNewCartItem,
-  deleteCartItemById,
+  deleteCartItem,
   updateCartItemQtyById,
 } = require('../controllers/cart.controller')
 const {
@@ -17,21 +17,10 @@ router.param('productId', findProductById)
 router.param('userId', findCartByUserId)
 
 router
-  /** url route - BASE_URL/api/cart/:userId */
-
-  // CREATE
   .post('/:userId/:productId', addNewCartItem)
-
-  // READ
   .get('/:userId', getCartItems)
-
-  // get Single Cart
   .get('/:userId/:productId', getOneCartItem)
-
-  // UPDATE
   .patch('/:userId/:productId', updateCartItemQtyById)
-
-  // DELETE
-  .delete('/:userId/:productId', deleteCartItemById)
+  .delete('/:userId/:productId', deleteCartItem)
 
 module.exports = router
