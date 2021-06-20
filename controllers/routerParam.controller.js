@@ -62,3 +62,23 @@ exports.findCartByUserId = async (req, res, next) => {
     })
   }
 }
+
+/**
+ * controller for Wishlist router.param middleware
+ */
+exports.findWishlistByUserId = async (req, res, next) => {
+  try {
+    const wishlist = await Wishlist.findById(req.params.userId)
+    if (!wishlist) res.status(400).send('wishlist Not found!')
+    req.wishlist = wishlist
+    consola.success('wishlist found by userId')
+    next()
+  } catch (err) {
+    consola.error(new Error('Cannot find wishlist by userId', err))
+    res.status(400).json({
+      success: false,
+      message: 'Unable to find the wishlist by userId',
+      error: err,
+    })
+  }
+}

@@ -1,86 +1,107 @@
-const Wishlist = require('../models/wishlist.model');
+const Wishlist = require('../models/wishlist.model')
 
 exports.getWishlistItems = async (req, res) => {
+  let { wishlist } = req
+
   try {
-    const wishlistItems = await Wishlist.find({});
+    wishlist = await wishlist.populate('wishlistItems.product').execPopulate()
     res.status(200).json({
       success: true,
-      wishlistItems,
-    });
+      message: "Successfully found User's Wishlist!",
+      userWishlist: wishlist,
+    })
   } catch (error) {
+    consola.error(new Error('Unable to get User Wishlist', error))
     res.status(500).json({
       success: false,
-      message: 'Failed to get wishlistItems',
+      message: "Failed to get User's Wishlist",
       errorMessage: error.message,
-    });
+    })
   }
-};
+}
 
-exports.findWishlistItemById = async (req, res) => {
+exports.getOneWishlistItem = async (req, res) => {
+  let { wishlist, product } = req
   try {
-    const wishlistItem = await Wishlist.findById(req.params.wishlistItemId);
+    let populatedWishlist = await wishlist
+      .populate('wishlistItems.product')
+      .execPopulate()
+    let desiredWishlistItem = populatedWishlist.wishlistItems.id(product._id)
     res.status(200).json({
       success: true,
-      wishlistItem,
-    });
+      message: 'WishlistItem found!',
+      wishlistItem: desiredWishlistItem,
+    })
   } catch (error) {
+    consola.error(new Error('Unable to get desired Wishlist Item', error))
     res.status(400).json({
       success: false,
-      message: 'Unable to retrive the wishlist Item',
-    });
+      message: 'Wishlist Item not found',
+      error: error,
+    })
   }
-};
+}
 
 exports.addNewWishlistItem = async (req, res) => {
+  let { product, wishlist } = req
   try {
-    const newWishlistItem = new Wishlist({
-      description: req.body.description,
-      image: req.body.image,
-      brandName: req.body.brandName,
-      price: req.body.price,
-      discount: req.body.discount,
-      rating: req.body.rating,
-      isNewProduct: req.body.isNewProduct,
-      sale: req.body.sale,
-      inStock: req.body.inStock,
-      fastDelivery: req.body.fastDelivery,
-      ratings: req.body.ratings,
-      numberOfRatings: req.body.numberOfRatings,
-      qty: req.body.qty,
-      category: req.body.category,
-      offer: req.body.offer,
-    });
-    const savedWishlistItem = await newWishlistItem.save();
-    res.json({
+    /** finding a sub-document */
+    let productAlreadyInWishlist = wishlist.wishlistItems.id(product._id)
+    if (productAlreadyInWishlist) {
+      return res.send('Product Already exists in Wishlist Items')
+    }
+    const newProductData = {
+      _id: product._id,
+      product: product._id,
+    }
+    // update does not return anything
+    await wishlist.updateOne({ $push: { wishlistItems: newProductData } })
+
+    let latestPopulatedWishlist = await Wishlist.findOne({ _id: wishlist._id })
+      .populate('wishlistItems.product')
+      .exec()
+
+    res.status(201).json({
       success: true,
-      message: 'WishlistItem successfully saved in the database',
-      savedWishlistItem,
-    });
+      message: 'wishlistItem saved successfully in the database',
+      latestWishlist: latestPopulatedWishlist,
+    })
   } catch (error) {
-    res.json({
-      success: false,
-      message: 'Failed to save new Wishlist Item in the database',
+    consola.error(new Error('Failed to Add new wishlist Item', error))
+    res.status(500).json({
+      success: 'false',
+      message: 'Failed to save new wishlistItem in the database',
       errorMessage: error.message,
-    });
+    })
   }
-};
+}
 
 exports.deleteWishlistItem = async (req, res) => {
+  let { wishlist, product } = req
   try {
-    const removeItem = await Wishlist.remove({
-      _id: req.params.wishlistItemId,
-    });
-    const newWishlistItems = await Wishlist.find();
+    /** Select a sub-document to be removed */
+    const wishlistItemToBeRemoved = wishlist.wishlistItems.id(product._id)
+
+    /** Remove the subdoc */
+    wishlistItemToBeRemoved.remove()
+    /** Save new wishlist to database */
+    wishlist.save()
+
+    const newlyPopulatedWishlist = await wishlist
+      .populate('wishlistItems.product')
+      .execPopulate()
     res.json({
       success: true,
-      deletedItem: removeItem,
-      newWishlistItems,
-    });
+      message: 'Wishlist Item successfully removed',
+      removedWishlistItem: wishlistItemToBeRemoved,
+      latestWishlist: newlyPopulatedWishlist,
+    })
   } catch (error) {
+    consola.error(new Error('Failed to remove wishlist Item', error))
     res.json({
       success: false,
-      message: 'Failed to delete wishlist Item',
+      message: 'Failed to remove wishlist Item',
       errorMessege: error.message,
-    });
+    })
   }
-};
+}

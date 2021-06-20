@@ -17,9 +17,12 @@ exports.getProducts = async (req, res) => {
   }
 }
 
-exports.getProduct = async (req, res) => {
+exports.getOneProduct = async (req, res) => {
+  let { product } = req
   try {
-    res.status(200).json({ success: true, product: req.product })
+    res
+      .status(200)
+      .json({ success: true, message: 'Product Successfully found!', product })
   } catch (error) {
     consola.error(new Error('Product not found', error))
     res.status(500).json({

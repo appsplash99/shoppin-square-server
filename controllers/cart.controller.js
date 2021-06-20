@@ -4,9 +4,13 @@ exports.getCartItems = async (req, res) => {
   let { cart } = req
   try {
     cart = await cart.populate('cartItems.product').execPopulate()
-    res.status(200).json({ success: true, cart })
+    res.status(200).json({
+      success: true,
+      message: "Successfully found User's Cart!",
+      cart,
+    })
   } catch (error) {
-    consola.error(new Error('Unable to get Cart Item by productId', error))
+    consola.error(new Error('Unable to get User Cart', error))
     res.status(500).json({
       success: false,
       message: 'Failed to get Cart Items',
@@ -34,11 +38,17 @@ exports.getOneCartItem = async (req, res) => {
 }
 
 exports.addNewCartItem = async (req, res) => {
-  let { product, cart, user } = req
+  let { product, cart } = req
   try {
     /** finding a sub-document */
     let productAlreadyInCart = cart.cartItems.id(product._id)
     if (productAlreadyInCart) {
+      /**
+       * TODO: HANDLE ALL(ACROSS THE APP) ERRORS WITH DESIRED:
+       * STATUS,
+       * SPECIFIC JSON MESSAGE
+       */
+
       return res.send('Product Already exists in CartItems')
     }
 
@@ -50,12 +60,15 @@ exports.addNewCartItem = async (req, res) => {
 
     // update does not return anything
     await cart.updateOne({ $push: { cartItems: newProductData } })
-    updatedCart = await cart.populate('cartItems.product').execPopulate()
+
+    let latestPoulatedCart = await Cart.findOne({ _id: cart._id })
+      .populate('cartItems.product')
+      .exec()
 
     res.status(201).json({
       success: true,
       message: 'cartItem saved successfully in the database',
-      updatedCart,
+      latestCart: latestPoulatedCart,
     })
   } catch (error) {
     consola.error(new Error('Failed to Add new cart Item', error))
@@ -99,7 +112,7 @@ exports.updateCartItemQtyById = async (req, res) => {
   }
 }
 
-exports.deleteCartItemById = async (req, res) => {
+exports.deleteCartItem = async (req, res) => {
   let { cart, product } = req
   try {
     /** Select a sub-document to be removed */
