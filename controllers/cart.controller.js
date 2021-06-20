@@ -1,4 +1,4 @@
-const Cart = require('../models/cart.model')
+const { extend, concat } = require('lodash')
 
 exports.getCartItems = async (req, res) => {
   let { cart } = req
@@ -43,32 +43,29 @@ exports.addNewCartItem = async (req, res) => {
     /** finding a sub-document */
     let productAlreadyInCart = cart.cartItems.id(product._id)
     if (productAlreadyInCart) {
-      /**
-       * TODO: HANDLE ALL(ACROSS THE APP) ERRORS WITH DESIRED:
-       * STATUS,
-       * SPECIFIC JSON MESSAGE
-       */
-
-      return res.send('Product Already exists in CartItems')
+      return res.status(500).send({
+        success: false,
+        message: 'Product Already exists in CartItems',
+      })
     }
 
-    const newProductData = {
-      _id: product._id,
-      product: product._id,
-      quantity: 1,
-    }
+    cart = extend(cart, {
+      cartItems: concat(cart.cartItems, {
+        _id: product._id,
+        product: product._id,
+        quantity: 1,
+      }),
+    })
+    cart = await cart.save()
 
-    // update does not return anything
-    await cart.updateOne({ $push: { cartItems: newProductData } })
-
-    let latestPoulatedCart = await Cart.findOne({ _id: cart._id })
+    let newlyPopulatedCart = await cart
       .populate('cartItems.product')
-      .exec()
+      .execPopulate()
 
     res.status(201).json({
       success: true,
       message: 'cartItem saved successfully in the database',
-      latestCart: latestPoulatedCart,
+      latestCart: newlyPopulatedCart,
     })
   } catch (error) {
     consola.error(new Error('Failed to Add new cart Item', error))
@@ -82,23 +79,21 @@ exports.addNewCartItem = async (req, res) => {
 
 exports.updateCartItemQtyById = async (req, res) => {
   let { cart, product } = req
+  let { quantity } = req.body
   try {
-    const updatedCartItem = await Cart.findOneAndUpdate(
-      { _id: cart._id, 'cartItems._id': product._id },
-      { $set: { 'cartItems.$.quantity': req.body.quantity } },
-      { useFindAndModify: false }
-    )
-    let newPopulatedCart = await cart
+    // TODO: confirm logic
+    let cartItemToBeUpdated = cart.cartItems.id(product._id)
+    let updatedCartItem = extend(cartItemToBeUpdated, { quantity })
+    cart.cartItems = extend(cart.cartItems, { updatedCartItem })
+    await cart.save()
+    let newlyPopulatedCart = await cart
       .populate('cartItems.product')
       .execPopulate()
-
-    /** Find the sub-document with _id equal to product._id*/
-    const newlyUpdatedCartItem = updatedCartItem.cartItems.id(product._id)
     res.json({
       success: true,
       message: "Cart Item's Quantity Updated Successfully!",
-      updatedCartItem: newlyUpdatedCartItem,
-      latestCartItems: newPopulatedCart,
+      updatedCartItem,
+      latestCartItems: newlyPopulatedCart,
     })
   } catch (err) {
     consola.error(
@@ -126,6 +121,7 @@ exports.deleteCartItem = async (req, res) => {
     const newlyPopulatedCart = await cart
       .populate('cartItems.product')
       .execPopulate()
+
     res.json({
       success: true,
       message: 'Cart Item successfully removed',

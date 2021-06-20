@@ -1,4 +1,4 @@
-const Wishlist = require('../models/wishlist.model')
+const { extend, concat } = require('lodash')
 
 exports.getWishlistItems = async (req, res) => {
   let { wishlist } = req
@@ -48,18 +48,24 @@ exports.addNewWishlistItem = async (req, res) => {
     /** finding a sub-document */
     let productAlreadyInWishlist = wishlist.wishlistItems.id(product._id)
     if (productAlreadyInWishlist) {
-      return res.send('Product Already exists in Wishlist Items')
+      // return as usual response
+      return res.status(500).send({
+        success: false,
+        message: 'Product Already exists in Wishlist Items',
+      })
     }
-    const newProductData = {
-      _id: product._id,
-      product: product._id,
-    }
-    // update does not return anything
-    await wishlist.updateOne({ $push: { wishlistItems: newProductData } })
 
-    let latestPopulatedWishlist = await Wishlist.findOne({ _id: wishlist._id })
+    wishlist = extend(wishlist, {
+      wishlistItems: concat(wishlist.wishlistItems, {
+        _id: product._id,
+        product: product._id,
+      }),
+    })
+    wishlist.save()
+
+    let latestPopulatedWishlist = await wishlist
       .populate('wishlistItems.product')
-      .exec()
+      .execPopulate()
 
     res.status(201).json({
       success: true,
@@ -87,7 +93,7 @@ exports.deleteWishlistItem = async (req, res) => {
     /** Save new wishlist to database */
     wishlist.save()
 
-    const newlyPopulatedWishlist = await wishlist
+    let newlyPopulatedWishlist = await wishlist
       .populate('wishlistItems.product')
       .execPopulate()
     res.json({
