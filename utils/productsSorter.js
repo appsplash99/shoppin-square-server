@@ -1,4 +1,12 @@
 exports.productsSorter = (reqQuerySort) => {
+  /**
+   * Types of Products Sorting -
+   * 1. price - asc/desc
+   * 2. discount - asc/desc
+   * 3. ratings - asc/desc
+   * 4. numberOfRatings - asc/desc
+   */
+
   switch (reqQuerySort) {
     case 'price_asc':
       return { price: 1 }
