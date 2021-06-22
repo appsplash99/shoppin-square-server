@@ -7,6 +7,9 @@ exports.productsSorter = (reqQuerySort) => {
    * 4. numberOfRatings - asc/desc
    */
 
+  // return empty object if falsy
+  if (!reqQuerySort) return {}
+
   switch (reqQuerySort) {
     case 'price_asc':
       return { price: 1 }

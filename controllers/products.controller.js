@@ -1,6 +1,7 @@
 const Product = require('../models/product.model')
 const { productsSorter } = require('../utils/productsSorter')
 const { productsFilter } = require('../utils/productsFilter')
+const { productsPagination } = require('../utils/productsPagination')
 
 exports.getOneProduct = async (req, res) => {
   let { product } = req
@@ -53,36 +54,16 @@ exports.addNewProduct = async (req, res) => {
   }
 }
 
-exports.getProducts = async (req, res) => {
-  try {
-    const products = await Product.find({})
-    res.status(200).json({
-      success: true,
-      products: products,
-    })
-  } catch (error) {
-    consola.error(new Error('Unable to get products', error))
-    res.status(500).json({
-      success: false,
-      message: 'Failed to get Products',
-      errorMessage: error.message,
-    })
-  }
-}
-
 exports.getPaginatedProducts = async (req, res) => {
   let reqQuery = req.query
   /** reqQuery contains -
    * http://localhost:3000/api/products?filter[in_stock]=true&filter[sale]=true&sort=price_asc
    */
 
-  // consuming paginatedResults from middleware's response
-  // let { paginatedResults } = res
-  // for pagination
-  let match = {}
-
-  const filterObj = productsFilter(reqQuery.filter)
-  const sortObj = productsSorter(reqQuery.sort)
+  let filterObj = productsFilter(reqQuery.filter)
+  let sortObj = productsSorter(reqQuery.sort)
+  let returnObj = await productsPagination(reqQuery.page, reqQuery.size)
+  let { limit, skip } = returnObj
 
   try {
     const products = await Product.find(
@@ -95,11 +76,13 @@ exports.getPaginatedProducts = async (req, res) => {
        */
       filterObj,
       null,
-      { sort: sortObj }
+      { sort: sortObj, limit, skip }
     ).exec()
     res.status(200).json({
       success: true,
-      products: products,
+      message: 'successfuly fetched Paginated Products',
+      ...returnObj,
+      products,
     })
   } catch (error) {
     consola.error(new Error('Unable to get sorted products', error))

@@ -9,6 +9,9 @@ exports.productsFilter = (reqQueryFilter) => {
    * 6. offer
    */
 
+  // return empty object if falsy
+  if (!reqQueryFilter) return {}
+
   const filterObj = {}
 
   if (reqQueryFilter.is_new_product)
