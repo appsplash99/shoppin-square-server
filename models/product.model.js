@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model } = require('mongoose')
 
 const productSchema = new Schema({
   description: {
@@ -6,8 +6,8 @@ const productSchema = new Schema({
     trim: true,
     required: 'description is required',
   },
-  image: {
-    type: String,
+  images: {
+    type: [],
     trim: true,
     required: 'image is required',
   },
@@ -51,6 +51,6 @@ const productSchema = new Schema({
   offer: {
     type: String,
   },
-});
+})
 
-module.exports = model('Product', productSchema);
+module.exports = model('Product', productSchema)
