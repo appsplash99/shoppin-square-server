@@ -3,13 +3,6 @@ const { productsSorter } = require('../utils/productsSorter')
 const { productsFilter } = require('../utils/productsFilter')
 const { productsPagination } = require('../utils/productsPagination')
 
-/**  */
-const mongoose = require('mongoose')
-const { MENS_PRODUCTS } = require('../fakerDB/fakerDB_Men')
-const { WOMENS_PRODUCTS } = require('../fakerDB/fakerDB_Women')
-
-/** */
-
 exports.getOneProduct = async (req, res) => {
   let { product } = req
   try {
@@ -101,18 +94,4 @@ exports.getPaginatedProducts = async (req, res) => {
       errorMessage: error.message,
     })
   }
-}
-
-exports.populateProductsInMyDb = async (req, res) => {
-  const allProductsWithId = [...MENS_PRODUCTS, ...WOMENS_PRODUCTS].map(
-    (productObj) => {
-      return { ...productObj, _id: mongoose.Types.ObjectId() }
-    }
-  )
-  const allProductsSaved = await Product.insertMany(allProductsWithId)
-  res.json({
-    success: true,
-    message: 'Successfully ran populateProductsInMyDb',
-    allProductsSaved,
-  })
 }

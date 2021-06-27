@@ -3,7 +3,6 @@ const {
   getOneProduct,
   addNewProduct,
   getPaginatedProducts,
-  populateProductsInMyDb,
 } = require('../controllers/products.controller')
 const { findProductById } = require('../middlewares/routerParam.middleware')
 
@@ -13,6 +12,5 @@ router
   .get('/', getPaginatedProducts)
   .get('/:productId', getOneProduct)
   .post('/', addNewProduct)
-  .post('/post-products', populateProductsInMyDb)
 
 module.exports = router
