@@ -16,13 +16,14 @@ const verifyToken = require('../middlewares/verifyToken.middleware')
  */
 router.get('/status', (req, res) => res.send('OK'))
 
+/** Public Routes */
 router.use('/products', productRoutes)
 router.use('/login', loginRoutes)
 router.use('/register', registerRoutes)
 
-// TODO: Protected Routes - need verifyToken Middleware
-router.use('/wishlist', wishlistRoutes)
-router.use('/cart', cartRoutes)
-router.use('/user', userRoutes)
+/** Private Routes */
+router.use('/wishlist', verifyToken, wishlistRoutes)
+router.use('/cart', verifyToken, cartRoutes)
+router.use('/user', verifyToken, userRoutes)
 
 module.exports = router

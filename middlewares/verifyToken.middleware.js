@@ -9,11 +9,7 @@ const verify = (req, res, next) => {
   // consuming token at each request from request headers
   // const token = req.header('auth-token')
 
-  /**
-   * Injected token from frontend is:
-   * token = `Bearer ${token}`;
-   * */
-  const token = req.headers.authorization.split(' ')[1]
+  const token = req.headers.authorization
   if (!token) return res.status(401).send('Access Denied')
 
   try {
