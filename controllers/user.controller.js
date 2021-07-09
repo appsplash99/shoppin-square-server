@@ -1,5 +1,4 @@
 const { extend } = require('lodash')
-const User = require('../models/user.model')
 const { generateHashedPassword } = require('../utils/generateHashedPassword')
 
 exports.getOneUser = async (req, res) => {
@@ -7,8 +6,8 @@ exports.getOneUser = async (req, res) => {
   user.password = undefined
   try {
     res.status(200).json({
-      success: false,
-      message: 'Unable to get User Details',
+      success: true,
+      message: 'Successfully found the user',
       user,
     })
   } catch (error) {
