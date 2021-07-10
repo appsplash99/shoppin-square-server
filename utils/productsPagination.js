@@ -7,7 +7,7 @@ exports.productsPagination = async (reqQueryPage, reqQueryLimit) => {
   let results = { page, limit }
 
   if (!page) results.page = 1
-  if (!limit) results.limit = 5 // default number of products per page
+  if (!limit) results.limit = 7 // default number of products per page
 
   results.skip = (results.page - 1) * results.limit
 

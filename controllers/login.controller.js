@@ -22,5 +22,7 @@ exports.loginUser = async (req, res) => {
   res.header('auth-token', token).json({
     success: true,
     token,
+    userId: user._id,
+    user: user
   })
 }
