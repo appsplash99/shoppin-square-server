@@ -1,6 +1,6 @@
 # shoppin-square-server
 
-An REST api built on Express - to serve react ecommerce
+A REST api built on Express - to serve react ecommerce
 
 ## <ins>PUBLIC ROUTES</ins>
 
