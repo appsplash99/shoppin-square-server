@@ -81,7 +81,6 @@ exports.updateCartItemQtyById = async (req, res) => {
   let { cart, product } = req
   let { quantity } = req.body
   try {
-    // TODO: confirm logic
     let cartItemToBeUpdated = cart.cartItems.id(product._id)
     let updatedCartItem = extend(cartItemToBeUpdated, { quantity })
     cart.cartItems = extend(cart.cartItems, { updatedCartItem })
