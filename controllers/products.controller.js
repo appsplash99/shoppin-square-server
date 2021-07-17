@@ -63,7 +63,7 @@ exports.getPaginatedProducts = async (req, res) => {
 
   let filterObj = productsFilter(reqQuery.filter)
   let sortObj = productsSorter(reqQuery.sort)
-  let returnObj = await productsPagination(reqQuery.page, reqQuery.size)
+  let returnObj = await productsPagination({reqQueryPage: reqQuery.page, reqQueryLimit: reqQuery.size, reqQueryFilter: reqQuery.filter})
   let { limit, skip } = returnObj
 
   try {

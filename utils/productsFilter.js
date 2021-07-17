@@ -26,3 +26,16 @@ exports.productsFilter = (reqQueryFilter) => {
 
   return filterObj
 }
+
+exports.productCategoryFromQuery = (reqQueryFilter) => {
+    // returns types of Product Document filter
+     if (reqQueryFilter && reqQueryFilter.category) {
+       if (reqQueryFilter.category==='women') {
+          return {category: 'women'};
+        }
+        if (reqQueryFilter.category==='men') {
+          return {category: 'men'};
+        }
+      }
+      return {};
+  }
