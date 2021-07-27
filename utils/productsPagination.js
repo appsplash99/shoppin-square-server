@@ -1,5 +1,5 @@
 const Product = require('../models/product.model')
-const {productCategoryFromQuery} = require('../utils/productsFilter')
+const {productsFilter} = require('../utils/productsFilter')
 
 exports.productsPagination = async ({reqQueryPage, reqQueryLimit, reqQueryFilter}) => {
   let page = parseInt(reqQueryPage)
@@ -14,7 +14,7 @@ exports.productsPagination = async ({reqQueryPage, reqQueryLimit, reqQueryFilter
   let startIndex = (results.page - 1) * results.limit
   let endIndex = results.page * results.limit
 
-  if (endIndex < (await Product.countDocuments().exec())) {
+  if (endIndex < (await Product.countDocuments({...productsFilter(reqQueryFilter)}).exec())) {
     results.next = {
       page: results.page + 1,
       limit: results.limit,
@@ -28,7 +28,7 @@ exports.productsPagination = async ({reqQueryPage, reqQueryLimit, reqQueryFilter
     }
   }
 
-  const totalPageDocs = await Product.countDocuments({...productCategoryFromQuery(reqQueryFilter)}).exec()
+  const totalPageDocs = await Product.countDocuments({...productsFilter(reqQueryFilter)}).exec()
 
   // might need to check this
   results.totalPages = Math.ceil(totalPageDocs/results.limit);
