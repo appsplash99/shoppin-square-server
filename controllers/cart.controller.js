@@ -136,3 +136,5 @@ exports.deleteCartItem = async (req, res) => {
     })
   }
 }
+
+exports.emptyUserCart = async (req, res) => {}
