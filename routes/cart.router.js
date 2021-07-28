@@ -19,10 +19,10 @@ router.param('userId', findCartByUserId)
 
 router
   .get('/:userId', getCartItems)
+  .post('/empty-cart/:userId', emptyUserCart)
   .get('/:userId/:productId', getOneCartItem)
   .post('/:userId/:productId', addNewCartItem)
   .patch('/:userId/:productId', updateCartItemQtyById)
   .delete('/:userId/:productId', deleteCartItem)
-  .post('/empty-cart/:userId', emptyUserCart)
 
 module.exports = router

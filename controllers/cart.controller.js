@@ -137,4 +137,28 @@ exports.deleteCartItem = async (req, res) => {
   }
 }
 
-exports.emptyUserCart = async (req, res) => {}
+exports.emptyUserCart = async (req, res) => {
+  let { cart } = req
+  try {
+    cart.cartItems = []; // empty user's cart
+    await cart.save();   // save new cart to db
+
+    const newlyPopulatedCart = await cart
+      .populate('cartItems.product')
+      .execPopulate()
+
+    res.json({
+      success: true,
+      message: "Successfully Emptied User's Cart",
+      latestCart: newlyPopulatedCart,
+    })
+  } catch {
+    consola.error(new Error("Failed to Empty User's Cart", error))
+    res.json({
+      success: false,
+      message: "Failed to Empty User's Cart",
+      errorMessege: error.message,
+    })
+  }
+
+}
