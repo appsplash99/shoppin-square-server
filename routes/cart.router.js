@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const {
   getCartItems,
+  emptyUserCart,
   getOneCartItem,
   addNewCartItem,
   deleteCartItem,
@@ -22,5 +23,6 @@ router
   .post('/:userId/:productId', addNewCartItem)
   .patch('/:userId/:productId', updateCartItemQtyById)
   .delete('/:userId/:productId', deleteCartItem)
+  .post('/empty-cart/:userId', emptyUserCart)
 
 module.exports = router
